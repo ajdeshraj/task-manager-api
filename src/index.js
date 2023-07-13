@@ -94,6 +94,7 @@ app.patch('/users/:id', async (req, res) => {
     }
 })
 
+// DELETE request to delete user by id from db
 app.delete('/users/:id', async(req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id)
@@ -185,6 +186,7 @@ app.patch('/tasks/:id', async (req, res) => {
     }
 })
 
+// DELETE request to delete task by id from db
 app.delete('/tasks/:id', async (req, res) => {
     try {
         const task = await Task.findByIdAndDelete(req.params.id)
