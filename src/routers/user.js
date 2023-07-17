@@ -1,6 +1,7 @@
 const express = require('express')
 const User = require('../models/user')
 const router = new express.Router()
+const auth = require('../middleware/auth')
 
 // POST request to add new user
 router.post('/users', async (req, res) => {
@@ -23,23 +24,9 @@ router.post('/users', async (req, res) => {
     // })
 })
 
-// GET request to get all users from db
-router.get('/users', async (req, res) => {
-    // Async await implementation
-    try {
-        const users = await User.find({})
-        res.send(users)
-    }
-    catch (error) {
-        res.status(500).send(error)
-    }
-    
-    // Old Code
-    // User.find({}).then((users) => {
-    //     res.send(users)
-    // }).catch((error) => {
-    //     res.status(500).send(error)
-    // })
+// GET request to get user data
+router.get('/users/me', auth, async (req, res) => {
+    res.send(req.user)
 })
 
 // POST request to sign in users
@@ -51,6 +38,32 @@ router.post('/users/login', async (req, res) => {
     }
     catch {
         res.status(400).send()
+    }
+})
+
+// POST request to logout user
+router.post('/users/logout', auth, async (req, res) => {
+    try {
+        req.user.tokens = req.user.tokens.filter((token) => token.token !== req.token)
+        await req.user.save()
+
+        res.send()
+    }
+    catch (error) {
+        res.status(500).send()
+    }
+})
+
+// POST request to logout user from all active sessions
+router.post('/users/logoutAll', auth, async (req, res) => {
+    try {
+        req.user.tokens = []
+        await req.user.save()
+
+        res.send()
+    }
+    catch (error) {
+        res.status(500).send()
     }
 })
 
