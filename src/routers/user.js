@@ -67,34 +67,8 @@ router.post('/users/logoutAll', auth, async (req, res) => {
     }
 })
 
-// GET request to get single user from db
-router.get('/users/:id', async (req, res) => {
-    // Async await implementation
-    const _id = req.params.id
-    try {
-        const user = await User.findById(_id)
-        if (!user) {
-            return res.status(404).send()
-        }
-        res.send(user)
-    }
-    catch (error) {
-        res.status(500).send(error)
-    }
-
-    // Old Code
-    // User.findById(_id).then((user) => {
-    //     if (!user) {
-    //         return res.status(404).send()
-    //     }
-    //     res.send(user)
-    // }).catch((error) => {
-    //     res.status(500).send(error)
-    // })
-})
-
 // PATCH request to update user based on id
-router.patch('/users/:id', async (req, res) => {
+router.patch('/users/me', auth, async (req, res) => {
     // Checking for valid updates
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'email', 'age', 'password']
@@ -105,17 +79,9 @@ router.patch('/users/:id', async (req, res) => {
     }
 
     try {
-        // Using findByIdAndUpdate(Mongoose) doesn't allow Middleware
-        // const user = await User.findByIdAndUpdate(req.params.id, req.body, {new: true, runValidators: true})
-
-        const user = await User.findById(req.params.id)
-        updates.forEach((update) => user[update] = req.body[update])
-        await user.save()
-
-        if (!user) {
-            return res.status(404).send()
-        }
-        res.send(user)
+        updates.forEach((update) => req.user[update] = req.body[update])
+        await req.user.save()
+        res.send(req.user)
     }
     catch (error) {
         res.status(400).send(error)
@@ -123,13 +89,10 @@ router.patch('/users/:id', async (req, res) => {
 })
 
 // DELETE request to delete user by id from db
-router.delete('/users/:id', async(req, res) => {
+router.delete('/users/me', auth, async(req, res) => {
     try {
-        const user = await User.findByIdAndDelete(req.params.id)
-        if (!user) {
-            return res.status(404).send()
-        }
-        res.send(user)
+        await req.user.remove()
+        res.send(req.user)
     }
     catch (error) {
         res.status(500).send(error)
