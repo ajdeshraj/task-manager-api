@@ -25,14 +25,5 @@ app.listen(3000, () => {
     console.log('Server is running on port 3000')
 })
 
-const jwt = require('jsonwebtoken')
-
-const myFunction = async () => {
-    const token = jwt.sign({_id: 'abc1234'}, 'thisisrandom', {expiresIn: '7 days'})
-    console.log(token)
-
-    const data = jwt.verify(token, 'thisisrandom')
-    console.log(data)
-}
-
-myFunction()
+const Task = require('./models/task')
+const User = require('./models/user.js')
