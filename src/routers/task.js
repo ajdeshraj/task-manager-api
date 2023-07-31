@@ -1,7 +1,12 @@
 const express = require('express')
+const multer = require('multer')
 const Task = require('../models/task')
 const router = new express.Router()
 const auth = require('../middleware/auth')
+
+const upload = multer({
+    dest: 'avatars'
+})
 
 // POST request to add new task
 router.post('/tasks', auth, async (req, res) => {
@@ -134,6 +139,10 @@ router.delete('/tasks/:id', auth, async (req, res) => {
     catch (error) {
         res.status(500).send(error)
     }
+})
+
+router.post('/users/me/avatar', upload.single('avatar'), (req, res) => {
+    res.send()
 })
 
 module.exports = router
